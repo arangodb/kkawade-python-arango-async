@@ -31,7 +31,6 @@ from arangoasync.exceptions import (
 )
 from arangoasync.typings import QueryExplainOptions
 
-
 @pytest.mark.asyncio
 async def test_simple_query(db, bad_db, doc_col, docs):
     await doc_col.insert(docs[0])
@@ -81,7 +80,6 @@ async def test_query_tracking(db, bad_db):
     with pytest.raises(AQLQueryTrackingSetError):
         _ = await bad_db.aql.set_tracking(enabled=False)
 
-
 @pytest.mark.asyncio
 async def test_list_queries(superuser, db, bad_db):
     aql = db.aql
@@ -96,9 +94,23 @@ async def test_list_queries(superuser, db, bad_db):
             break
 
     # Only superuser can list all queries from all databases.
+    connection = superuser.connection
+    print("DBG: ---------------- SUPERUSER ---------------")
+    print("DBG: Connection: {} {}".format(type(connection), connection))
+    print("DBG: DbName: {}".format(superuser.name))
+    print("DBG: User Properties: {}".format(await superuser.properties()))
+    print("DBG: User status: {}".format(await superuser.status()))
+
+    print(f"DBG: ---------------- CONNECTION ---------------")
+    # if type(connection) != BasicConnection:
+    print("DBG: Connection token: {}".format(connection.token))
+
+    print(f"DBG: ---------------- AQL ---------------")
+    print("DBG: AQL context: {}".format(superuser.aql.context))
+
     all_queries = await superuser.aql.queries(all_queries=True)
     assert len(all_queries) > 0
-
+    
     # Only test no-throws.
     _ = await aql.slow_queries()
     _ = await superuser.aql.slow_queries(all_queries=True)
@@ -123,7 +135,6 @@ async def test_list_queries(superuser, db, bad_db):
         _ = await bad_db.aql.history()
 
     long_running_task.cancel()
-
 
 @pytest.mark.asyncio
 async def test_kill_query(db, bad_db, superuser):
