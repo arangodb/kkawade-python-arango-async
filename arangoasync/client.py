@@ -192,6 +192,8 @@ class ArangoClient:
         if isinstance(auth, str):
             auth = Auth(password=auth)
 
+        print(f"DBG: auth_method: {auth_method}")
+
         if auth_method == "basic":
             if auth is None:
                 raise ValueError("Basic authentication requires the `auth` parameter")

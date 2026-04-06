@@ -96,17 +96,19 @@ async def test_list_queries(superuser, db, bad_db):
     # Only superuser can list all queries from all databases.
     connection = superuser.connection
     print("DBG: ---------------- SUPERUSER ---------------")
-    print("DBG: Connection: {} {}".format(type(connection), connection))
-    print("DBG: DbName: {}".format(superuser.name))
-    print("DBG: User Properties: {}".format(await superuser.properties()))
-    print("DBG: User status: {}".format(await superuser.status()))
+    print(f"DBG: Connection: {type(connection)} {connection}")
+    print(f"DBG: DbName: {superuser.name}")
+    print(f"DBG: User Properties: {await superuser.properties()}")
+    print(f"DBG: User status: {await superuser.status()}")
 
-    print(f"DBG: ---------------- CONNECTION ---------------")
-    # if type(connection) != BasicConnection:
-    print("DBG: Connection token: {}".format(connection.token))
+    print("DBG: ---------------- CONNECTION ---------------")
+    print(f"DBG: JWT token: {connection.token.token}")
+    print(f"DBG: JWT current time: {int(time.time())}")
+    print(f"DBG: JWT token expiry: {connection.token._token_exp}")
+    print(f"DBG: JWT token, needs refresh: {connection.token.needs_refresh()}")
 
-    print(f"DBG: ---------------- AQL ---------------")
-    print("DBG: AQL context: {}".format(superuser.aql.context))
+    print("DBG: ---------------- AQL ---------------")
+    print(f"DBG: AQL context: {superuser.aql.context}")
 
     all_queries = await superuser.aql.queries(all_queries=True)
     assert len(all_queries) > 0
@@ -385,3 +387,4 @@ async def test_aql_function_management(db, bad_db):
     assert result["deletedCount"] == 1
     functions = await aql.functions()
     assert len(functions) == 0
+
